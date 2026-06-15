@@ -3,6 +3,218 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>上海中考冲刺 - 错题本</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f7;--card:#fff;--text:#1d1d1f;--text2:#6e6e73;--border:#e5e5ea;--primary:#007aff}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;padding:0 0 70px}
+.header{background:var(--card);padding:14px 16px 8px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border)}
+.header h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+.header .sub{font-size:11px;color:var(--text2);margin-top:2px}
+.tabs{display:flex;gap:5px;padding:8px 16px 4px;overflow-x:auto;position:sticky;top:48px;z-index:9;background:var(--bg)}
+.tab{padding:6px 14px;border-radius:16px;border:none;background:var(--card);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06);flex-shrink:0}
+.tab.active{color:#fff;font-weight:600}
+.tab.act-yuwen{background:#e74c3c}.tab.act-shuxue{background:#3498db}.tab.act-yingyu{background:#2ecc71}.tab.act-wuli{background:#f39c12}.tab.act-huaxue{background:#9b59b6}
+.err-area{padding:0 16px 6px}
+.err-select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--card);outline:none;color:var(--text)}
+.mic-area{text-align:center;padding:6px 16px 2px}
+.mic-btn{width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#007aff,#5856d6);color:#fff;font-size:26px;cursor:pointer;box-shadow:0 3px 14px rgba(0,122,255,.35);display:inline-flex;align-items:center;justify-content:center}
+.mic-btn.recording{background:#ff3b30;animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 12px rgba(255,59,48,.2)}}
+.mic-label{font-size:11px;color:var(--text2);margin-top:2px}
+.inp-area{padding:0 16px;display:flex;flex-direction:column;gap:5px}
+.inp-row{display:flex;gap:6px}
+.inp-row .lbl{font-size:12px;font-weight:600;color:var(--text2);width:44px;flex-shrink:0;line-height:34px}
+.inp-row textarea{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;resize:none;height:34px;line-height:1.4;outline:none;background:var(--card)}
+.actions{padding:4px 16px;display:flex;gap:8px}
+.actions .s-btn{flex:1;padding:9px;border:none;background:var(--primary);color:#fff;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer}
+.actions .s-btn:active{opacity:.8}
+.tbox{display:none;margin:4px 16px;padding:8px 10px;background:var(--card);border-radius:10px;font-size:13px;color:var(--text2)}
+.tbox.show{display:block}
+.proc{display:none;justify-content:center;gap:6px;padding:4px;color:var(--text2);font-size:12px}
+.proc.show{display:flex}
+.list{padding:4px 16px 20px;display:flex;flex-direction:column;gap:10px}
+.empty{padding:40px 20px;text-align:center;color:var(--text2);font-size:13px;line-height:1.6}
+.card{background:var(--card);border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,.06);overflow:hidden}
+.card-h{padding:8px 12px 6px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.card-h .left{display:flex;align-items:center;gap:5px}
+.bdg{padding:1px 8px;border-radius:10px;font-size:10px;color:#fff;font-weight:600}
+.bdg-yuwen{background:#e74c3c}.bdg-shuxue{background:#3498db}.bdg-yingyu{background:#2ecc71}.bdg-wuli{background:#f39c12}.bdg-huaxue{background:#9b59b6}
+.tp{font-size:10px;padding:1px 8px;border-radius:10px;background:#f0f0f5;color:var(--text2)}
+.dt{font-size:10px;color:var(--text2)}
+.del{background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:2px;opacity:.4}
+.del:active{opacity:1;color:#e74c3c}
+.body{padding:10px 12px}
+.blk{margin-bottom:8px}.blk:last-child{margin-bottom:0}
+.blk-h{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px}
+.blk-b{font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<div class="header"><h1>🗂 上海中考错题本</h1><div class="sub">选科目+错因→说/打问题→自动整理</div></div>
+<div class="tabs" id="tabs"></div>
+<div class="err-area"><select class="err-select" id="errType"><option value="">选择错因类型</option></select></div>
+<div class="mic-area"><button class="mic-btn" id="micBtn">🎤</button><div class="mic-label" id="micLabel">点麦克风说话，或直接打字</div></div>
+<div class="inp-area"><div class="inp-row"><div class="lbl">📝题目</div><textarea id="qInp" placeholder="比如：现在完成时和一般过去时的区别" rows="1"></textarea></div><div class="inp-row"><div class="lbl">❌错在哪</div><textarea id="eInp" placeholder="比如：分不清have been和went什么时候用" rows="1"></textarea></div></div>
+<div class="actions"><button class="s-btn" id="saveBtn">+ 存入错题本</button></div>
+<div class="tbox" id="tbox"></div><div class="proc" id="proc"><span>⏳ 整理中...</span></div>
+<div class="list" id="list"></div>
+<script>
+var S=["yuwen","shuxue","yingyu","wuli","huaxue"];
+var N=["语文","数学","英语","物理","化学"];
+var A="yingyu";
+var NOTES=[];
+var REC=false,PRO=false;
+try{var D=localStorage.getItem("ctb_v6");if(D)NOTES=JSON.parse(D);}catch(e){}
+function Q(i){return document.getElementById(i);}
+var ET={"yuwen":["古诗默写","文言文","阅读理解","作文","成语病句","基础知识"],"shuxue":["概念不清","公式记错","计算失误","解题思路","粗心"],"yingyu":["语法","单词拼写","固定搭配","时态语态","阅读理解","作文"],"wuli":["概念理解","公式应用","受力分析","计算错误","实验"],"huaxue":["方程式","概念","计算","实验操作","物质推断"]};
+// --- Knowledge Base ---
+var KB={
+yingyu:[
+{m:["一般现在时","第三人称单数","三单"],t:"一般现在时·第三人称单数",b:"主语是he/she/it或单数名词时，谓语动词加-s或-es。\n\n变化规则：\n1.一般动词直接加-s（like→likes）\n2.以s/x/sh/ch/o结尾加-es（go→goes）\n3.辅音+y变y为i加-es（study→studies）\n4.have→has\n\n易错：否定句疑问句加了does后动词还原！\nHe doesn't like it.（不是likes）"},
+{m:["现在完成时","have done","has done","have been","过去分词"],t:"现在完成时 have/has+过去分词",b:"表示过去动作对现在有影响，或从过去持续到现在。\n\n结构：\n肯定：主语+have/has+过去分词\n否定：主语+haven't/hasn't+过去分词\n\n与一般过去时的区别：\n现在完成时→强调对现在的影响\n一般过去时→强调过去动作本身\n\nI have lost my key.（现在还没找到）\nI lost my key yesterday.（只是说昨天丢了）\n\n标志词：already, yet, just, ever, never, since, for"},
+{m:["过去完成时","had done","过去的过去","by the time"],t:"过去完成时 had+过去分词",b:"「过去的过去」——在过去某个时间之前已完成。\n\n结构：had+过去分词\n\n用法：\n1. by+过去时间\n  By the time he arrived, I had finished dinner.\n2. before/after/when从句\n  When I got there, the train had already left.\n3. 间接引语\n  She said she had seen the movie."},
+{m:["被动语态","be done","被动态","被动"],t:"被动语态 be+过去分词",b:"公式：be+及物动词的过去分词\n\n各时态：\n一般现在：am/is/are+done\n一般过去：was/were+done\n现在完成：have/has been+done\n一般将来：will be+done\n情态：can/must be+done\n\n主动变被动三步：\n1.宾语变主语\n2.动词改be+过去分词\n3.主语前加by\n\n必背：It is said that...(据说...)"},
+{m:["虚拟语气","if条件句","would","if i were"],t:"虚拟语气·If条件句",b:"真实条件句→will\n虚拟条件句→would\n\n真实（很可能发生）：\nIf+一般现在时,主句+will+动词原形\n例：If it rains, I will stay home.\n\n虚拟（与现在相反）：\nIf+一般过去时,主句+would+动词原形\n注意：be一律用were！\n例：If I were you, I would study harder."},
+{m:["定语从句","关系代词","which","that","who","which","whom","whose"],t:"定语从句·关系代词",b:"一个句子充当定语，修饰前面的名词（先行词）。\n\n关系代词：\nwho→人（主语）\nwhich→物\nthat→人或物\nwhose→某人的\n\n只能用that的情况（必考）：\n1.先行词有最高级（the best）\n2.先行词有不定代词（all/everything/nothing）\n3.被the very/only修饰\n4.既有人又有物"},
+{m:["非谓语","doing","to do","不定式","动名词"],t:"非谓语动词",b:"三种形式：\nto do→目的/将来\ndoing→习惯/进行\ndone→被动/完成\n\n后接to do：want, hope, decide, plan, refuse\n后接doing：enjoy, finish, keep, mind, practice\nstop to do(停下去做) vs stop doing(停止做)\n\n高频：be used to doing(习惯做)\nlook forward to doing(期待做)\n（这些to是介词不是不定式！）"},
+{m:["主谓一致","就近原则","就远原则","the number","a number"],t:"主谓一致",b:"三条原则：语法一致、意义一致、就近原则\n\n高频陷阱：\n就远原则：The teacher, together with his students, is playing.\nEither of the answers is correct.\nA number of students are waiting.\nThe number of students is 50."},
+{m:["单词","背单词","拼写","记不住","词汇"],t:"单词记忆方法",b:"不要死记字母！用自然拼读法：\n按音节拆分→读音拼写对应→结合句子记忆\n\n高频易混词：\ndesert(沙漠) vs dessert(甜点)\naffect(动词影响) vs effect(名词影响)\nthrough(通过) vs thorough(彻底的)"},
+{m:["比较级","最高级","as as","than"],t:"比较级和最高级",b:"短词加-er/-est，多音节more/most+原级\n\n不规则变化（必背）：\ngood/well→better→best\nbad/badly→worse→worst\nmany/much→more→most\nlittle→less→least\n\n句型：\nas+原级+as（和...一样）\nnot as+原级+as（不如...）\nthe+比较级, the+比较级（越...越...）"},
+{m:["固定搭配","词组","短语","介词","搭配"],t:"常考固定搭配",b:"动词短语：\nlook for(寻找) look after(照顾)\nlook forward to(期待) take care of(照顾)\ntake part in(参加) come up with(想出)\n\n介词短语：\nbe interested in(对...感兴趣)\nbe good at(擅长)\nbe afraid of(害怕)\nbe proud of(以...为傲)"}
+],
+shuxue:[
+{m:["二次函数","抛物线","顶点","对称轴"],t:"二次函数 y=ax²+bx+c",b:"a>0开口向上，a<0开口向下\n\n顶点式：y=a(x-h)²+k\n顶点坐标：(h,k) 对称轴：x=h\n\n关键：\n顶点横坐标 x=-b/(2a)\n对称轴 x=-b/(2a)\n\n与x轴交点：Δ=b²-4ac\nΔ>0两个交点 Δ=0一个交点 Δ<0无交点\n\n易错：y=2(x-3)²+1→顶点(3,1)不是(-3,1)！"},
+{m:["一元二次","求根","判别式","因式分解","韦达定理"],t:"一元二次方程 ax²+bx+c=0",b:"求根公式：x=[-b±√(b²-4ac)]/(2a)\n\n判别式Δ=b²-4ac\nΔ>0两个实根 Δ=0一个根 Δ<0无实数根\n\n韦达定理：\nx₁+x₂=-b/a\nx₁·x₂=c/a\n\n因式分解法：x²-5x+6=(x-2)(x-3)=0\n解得x=2或x=3"},
+{m:["相似三角形","相似比","三角形相似","A字型","8字型"],t:"相似三角形",b:"判定定理：\nAA：两角对应相等\nSAS：两边成比例且夹角相等\nSSS：三边对应成比例\n\n常见模型：\nA字型：DE∥BC→△ADE∼△ABC\n8字型：AB∥CD→△AOB∼△DOC\n\n性质：相似比=k，面积比=k²（平方！易错）"},
+{m:["圆","圆周角","圆心角","垂径定理","切线"],t:"圆",b:"垂径定理：垂直于弦的直径平分该弦和平分弧。\n\n圆周角与圆心角：\n同弧圆周角=一半圆心角\n直径所对圆周角=90°（高频！）\n\n切线判定：过半径外端且垂直于半径\n切线性质：切线垂直于过切点的半径\n\n扇形弧长l=nπr/180 面积S=nπr²/360"},
+{m:["反比例函数","y=k/x","双曲线"],t:"反比例函数 y=k/x",b:"y=k/x(k≠0,x≠0)\n图像：双曲线，关于原点对称\n\nk的几何意义：\n|k|=双曲线上任一点向两坐标轴作垂线所得矩形面积\n\n增减性：\nk>0：一三象限y随x增大而减小\nk<0：二四象限y随x增大而增大\n不能跨象限说增减性！"},
+{m:["三角函数","正弦","余弦","正切","sin","cos","tan","30度","45度","60度"],t:"锐角三角函数",b:"定义：\nsinA=对边/斜边\ncosA=邻边/斜边\ntanA=对边/邻边\n\n特殊角值（必背！）：\n30°：sin=1/2 cos=√3/2 tan=√3/3\n45°：sin=√2/2 cos=√2/2 tan=1\n60°：sin=√3/2 cos=1/2 tan=√3\n\n口诀：\"一二三三二一\"\n30°sin=√1/2, 45°sin=√2/2, 60°sin=√3/2"},
+{m:["概率","统计","树状图","列表法","中位数","众数","方差"],t:"概率与统计",b:"概率：P=满足条件结果数/所有等可能结果数\n\n统计量：\n平均数=和÷个数\n中位数=排序后中间的数\n众数=出现次数最多的数\n\n方法：两步概率用列表法或树状图"}
+],
+yuwen:[
+{m:["古诗词","古诗","默写","诗词","背诵","名句"],t:"古诗词·易错字",b:"重点篇目：\n观沧海 次北固山下 钱塘湖春行 天净沙秋思\n望岳 登飞来峰 游山西村 木兰诗 陋室铭 爱莲说\n\n易错字：\n\"海日生残夜\"→是\"生\"不是\"升\"\n\"丰年留客足鸡豚\"→注意\"豚\"写法\n\"山重水复疑无路\"→不是\"水重\"\n\"柳暗花明又一村\"→不是\"暗柳\"\n\n记忆法：理解诗意→想象画面→反复默写"},
+{m:["文言文","古文","虚词","实词","之","其","而","于","以"],t:"文言文·常考虚词",b:"「之」的用法：\n1.代词(知之者不如好之者)\n2.助词\"的\"(水陆草木之花)\n3.取消独立性(莲之出淤泥而不染)\n4.宾语前置标志(何陋之有)\n\n「而」的用法：\n并列(黑质而白章) 承接(温故而知新)\n转折(人不知而不愠) 修饰(笑而止之)\n\n「以」的用法：\n用/拿(以刀劈狼首) 来(无从致书以观)\n因为(不以物喜) 认为(皆以美于徐公)"},
+{m:["作文","写作","素材","记叙文","开头","结尾"],t:"作文提分要点",b:"评分：内容20分+语言20分+结构10分+卷面10分\n\n记叙文结构：\n开头：环境/设问/引用→点题\n中间：1件具体的事（详写细节！）\n结尾：感悟升华→再次点题\n\n素材准备：亲情类、友情类、成长类、励志类各备2个"},
+{m:["阅读理解","现代文","阅读","赏析","说明文","议论文"],t:"现代文阅读理解",b:"题型思路：\n概括题：谁+做了什么+结果\n赏析题：修辞+写出了什么+表达了什么\n含义题：表层+深层\n作用题：内容上+结构上\n\n常见修辞：\n比喻→生动形象 拟人→赋予情感\n排比→增强语势 设问→引起思考\n\n技巧：从原文找关键句！分点作答①②③"},
+{m:["成语","病句","语病","词语"],t:"成语和病句",b:"易错成语：\n望其项背→追得上(常用否定)\n不以为然→不认为正确\n美轮美奂→只能形容建筑\n炙手可热→贬义\n\n病句类型：\n搭配不当、语序不当、成分残缺、句式杂糅、不合逻辑"}
+],
+wuli:[
+{m:["力学","牛顿","力","重力","摩擦力","受力分析","惯性"],t:"力学基础",b:"牛顿第一定律：不受外力时保持静止或匀速直线运动\n惯性只与质量有关，质量越大惯性越大\n\n牛顿第三定律：作用力与反作用力\n大小相等方向相反，作用在不同物体上\n\n受力分析步骤：\n1.定对象 2.画重力↓ 3.画支持力 4.画摩擦力 5.画拉力\n\n摩擦力f=μN\n增大摩擦：增大压力/使接触面粗糙\n陷阱：光滑表面不受摩擦力！"},
+{m:["压强","液体压强","大气压","p=F","p=ρgh","压力"],t:"压强",b:"基本公式：p=F/S\nF=压力(N) S=受力面积(m²)\n\n液体压强：p=ρgh\n只与密度和深度有关，与容器形状无关！\n\n大气压：标准大气压=1.013×10⁵Pa\n海拔越高气压越低\n\n注意：压力不一定等于重力！"},
+{m:["浮力","阿基米德","浮沉","漂浮","悬浮","密度计","轮船"],t:"浮力·阿基米德原理",b:"阿基米德：F浮=ρ液·g·V排\n方向竖直向上\n\n浮沉条件：\nρ物>ρ液→下沉(F浮<G)\nρ物=ρ液→悬浮(F浮=G)\nρ物<ρ液→上浮→漂浮(F浮=G)\n漂浮时F浮=G，V排<V物\n\n常见：轮船从河到海上浮，潜水艇改变自重"},
+{m:["欧姆定律","电流","电压","电阻","串并联","I=U/R","功率","P=UI"],t:"欧姆定律和电学",b:"欧姆定律：I=U/R  U=IR  R=U/I\n\n串联：I相等U分压R总=R₁+R₂\n并联：U相等I分流1/R总=1/R₁+1/R₂\n\n电功率：P=UI=I²R=U²/R\n\n易错：电阻R由材料/长度/横截面积/温度决定\n与U和I无关！不能说\"R与U成正比\"！"},
+{m:["光学","光","反射","折射","平面镜","凸透镜","透镜成像"],t:"光学",b:"反射定律：反射角等于入射角，光路可逆\n\n平面镜成像：正立等大虚像，物距=像距\n\n凸透镜成像（必考！）：\nu>2f→倒立缩小实像→照相机\nf<u<2f→倒立放大实像→投影仪\nu<f→正立放大虚像→放大镜\n口诀：一倍焦距分虚实，二倍焦距分大小"},
+{m:["能量","机械能","动能","势能","功","功率"],t:"机械能和功",b:"功：W=Fs 单位J\n做功条件：1.有力 2.在力的方向上有位移\n\n机械能守恒：\n动能Ek=½mv² 重力势能Ep=mgh\n动能+重力势能+弹性势能=常数\n\n功率：P=W/t=Fv"},
+{m:["热学","热量","比热容","温度","内能","Q=cmΔt"],t:"热学",b:"热量Q=cmΔt\nc水=4.2×10³J/(kg·℃)\n\n改变内能方式：\n1.做功(压缩气体/摩擦生热)\n2.热传递(传导/对流/辐射)\n\n常考：水比热容最大→做冷却剂\n沿海昼夜温差小，内陆温差大"}
+],
+huaxue:[
+{m:["化学方程式","配平","化合价","反应类型"],t:"化学方程式和化合价",b:"化合价口诀（必背）：\n一价钾钠氢氯银\n二价氧钙钡镁锌\n三铝四硅五价磷\n二三铁、二四碳\n二四六硫都齐全\n铜汞二价最常见\n\n四大反应：\n化合A+B=AB 分解AB=A+B\n置换A+BC=AC+B 复分解AB+CD=AD+CB\n\n复分解条件：有水/气体/沉淀生成"},
+{m:["酸碱盐","酸","碱","盐","PH","中和","ph"],t:"酸碱盐",b:"指示剂：\n紫色石蕊→酸红碱蓝\n无色酚酞→酸无色碱红\n（中性和酸性酚酞都是无色！）\n\npH：<7酸性 =7中性 >7碱性\n\n常见酸：\n盐酸HCl+AgNO₃→白色沉淀（检验Cl⁻）\n硫酸H₂SO₄+BaCl₂→白色沉淀（检验SO₄²⁻）\n浓硫酸有吸水性可作干燥剂\n\n中和反应：酸+碱→盐+水(放热)\n胃酸过多用Al(OH)₃ 酸性土壤用Ca(OH)₂"},
+{m:["金属","金属活动性","置换","铁","铜","铝"],t:"金属的化学性质",b:"活动性顺序（必背）：\nK Ca Na Mg Al Zn Fe Sn Pb (H) Cu Hg Ag Pt Au\n排在H前面能置换酸中的氢\n\n重点反应：\nFe+CuSO₄→FeSO₄+Cu(铁上红色固体)\nFe+2HCl→FeCl₂+H₂↑(气泡浅绿色)\n\n注意：铁与酸/盐生成Fe²⁺(亚铁)不是Fe³⁺！\n溶液是浅绿色不是黄色！"},
+{m:["溶液","溶解度","饱和","不饱和","溶质质量分数"],t:"溶液",b:"溶质+溶剂=溶液\n饱和=不能再溶解 不饱和=还能继续溶解\n\n溶解度：100g溶剂中最多溶解的质量\n固体大多随温升增大\n气体随温升减小，随压增增大\n\n溶质质量分数：w=(溶质质量/溶液质量)×100%\n稀释：m₁w₁=m₂w₂(溶质质量不变)"},
+{m:["元素周期表","元素","电子","原子","质子","中子","最外层"],t:"物质结构",b:"原子=原子核(质子+中子)+核外电子\n质子数=核电荷数=原子序数=核外电子数\n\n化学性质由最外层电子数决定！\n金属<4易失电子 非金属≥4易得电子\n稀有气体最外层8(He为2)稳定\n\n周期表：横行=周期(电子层相同)\n纵列=族(最外层电子相同)\n前20号元素要会默写！"},
+{m:["实验","操作","制取","收集","检验","酒精灯","过滤"],t:"化学实验操作",b:"气体检验：\nO₂：带火星木条复燃\nCO₂：澄清石灰水变浑浊\nH₂：点燃淡蓝火焰杯壁有水珠\n\n气体制取：\nO₂：2KMnO₄→加热→K₂MnO₄+MnO₂+O₂↑\n试管口略向下倾斜，管口塞棉花\nCO₂：CaCO₃+2HCl→CaCl₂+H₂O+CO₂↑\n（不用稀硫酸！会生成CaSO₄覆盖）\n\n操作注意：\n稀释浓硫酸→酸缓慢注入水中（不能反过来！）"}
+]
+};
+// --- Knowledge Lookup ---
+function lookup(txt){
+  var entries=KB[A]||[];
+  var best=null,score=0;
+  for(var i=0;i<entries.length;i++){
+    var s=0;
+    for(var k=0;k<entries[i].m.length;k++){if(txt.indexOf(entries[i].m[k])>-1)s+=entries[i].m[k].length;}
+    if(s>score){score=s;best=entries[i];}
+  }
+  return best?('【'+best.t+'】\n'+best.b):'';
+}
+// --- Render ---
+function renderTabs(){
+  var h="";
+  for(var i=0;i<S.length;i++){h+='<button class="tab'+(S[i]===A?' active act-'+S[i]:'')+'" data-s="'+S[i]+'">'+N[i]+'</button>';}
+  Q("tabs").innerHTML=h;
+}
+function renderErrTypes(){
+  var t=ET[A]||[];
+  var h='<option value="">选择错因类型</option>';
+  for(var i=0;i<t.length;i++)h+='<option value="'+t[i]+'">'+t[i]+'</option>';
+  Q("errType").innerHTML=h;
+}
+function renderNotes(){
+  var f=[];
+  for(var i=NOTES.length-1;i>=0;i--){if(NOTES[i].s===A)f.push(NOTES[i]);}
+  if(!f.length){
+    var ni=0;for(var j=0;j<S.length;j++){if(S[j]===A){ni=j;break;}}
+    Q("list").innerHTML='<div class="empty">还没有'+N[ni]+'的错题<br>选错因类型→填题目和错因→保存</div>';return;
+  }
+  function nm(s){for(var j=0;j<S.length;j++){if(S[j]===s)return N[j];}return s;}
+  var h="";
+  for(var i=0;i<f.length;i++){
+    var o=f[i];
+    h+='<div class="card"><div class="card-h"><div class="left"><span class="bdg bdg-'+o.s+'">'+nm(o.s)+'</span><span class="tp">'+o.t+'</span></div><span class="dt">'+o.d+'</span><button class="del" data-d="'+o.id+'">✕</button></div><div class="body">'+
+    (o.q?'<div class="blk"><div class="blk-h">📝 题目</div><div class="blk-b">'+o.q+'</div></div>':'')+
+    (o.e?'<div class="blk"><div class="blk-h">❌ 我的错误</div><div class="blk-b">'+o.e+'</div></div>':'')+
+    (o.x?'<div class="blk"><div class="blk-h">✅ 正确解法+知识点解析</div><div class="blk-b">'+o.x+'</div></div>':'')+
+    '</div></div>';
+  }
+  Q("list").innerHTML=h;
+}
+function saveNotes(){try{localStorage.setItem("ctb_v6",JSON.stringify(NOTES));}catch(e){}}
+function addNote(o){NOTES.push(o);saveNotes();renderNotes();}
+function delNote(id){var t=[];for(var i=0;i<NOTES.length;i++){if(NOTES[i].id!==id)t.push(NOTES[i]);}NOTES=t;saveNotes();renderNotes();}
+// --- Events ---
+Q("tabs").addEventListener("click",function(e){
+  var t=e.target.closest(".tab");if(!t)return;
+  A=t.getAttribute("data-s");renderTabs();renderErrTypes();renderNotes();
+});
+Q("saveBtn").addEventListener("click",function(){
+  var ty=Q("errType").value;if(!ty){alert("请选择错因类型");return;}
+  var qu=Q("qInp").value.trim();var er=Q("eInp").value.trim();
+  if(!qu&&!er){alert("请填写题目或错误描述");return;}
+  // KB lookup
+  var txt=(qu+" "+er).replace(/[呃嗯那个然后就是所以反正其实]/g,"");
+  var sol=lookup(txt);
+  if(!sol)sol="【学习笔记】\n关于「"+(qu||er).slice(0,12)+"…」的错题已保存。\n\n复习建议：\n1. 翻开课本找到对应章节\n2. 把定义/公式/规则抄一遍\n3. 做2-3道对应练习题\n4. 过两天回来复习这道错题";
+  var d=new Date();
+  addNote({
+    id:Date.now(),s:A,t:ty,q:qu||"(未填写)",e:er||"(未填写)",x:sol,
+    d:d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)
+  });
+  Q("qInp").value="";Q("eInp").value="";
+  Q("micLabel").textContent="✅ 已保存！再记一条";
+  setTimeout(function(){Q("micLabel").textContent="点麦克风说话，或直接打字";},2000);
+});
+Q("list").addEventListener("click",function(e){
+  var b=e.target.closest("[data-d]");if(!b)return;
+  if(confirm("删除这条错题？"))delNote(Number(b.getAttribute("data-d")));
+});
+[Q("qInp"),Q("eInp")].forEach(function(el){
+  el.addEventListener("input",function(){this.style.height="34px";this.style.height=Math.min(this.scrollHeight,90)+"px";});
+});
+// --- Voice ---
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+var RCG=null;if(SR){RCG=new SR();RCG.lang="zh-CN";RCG.continuous=true;RCG.interimResults=true;}
+if(RCG){
+  Q("micBtn").addEventListener("click",function(){
+    if(PRO)return;
+    if(REC){REC=false;RCG.stop();Q("micBtn").classList.remove("recording");Q("micLabel").textContent="处理中...";return;}
+    REC=true;Q("micBtn").classList.add("recording");Q("micLabel").textContent="🎤 正在听...说说题目和哪里错了";
+    Q("tbox").classList.remove("show");Q("tbox").textContent="";RCG.start();
+  });
+  var FT="";
+  RCG.onresult=function(e){var it="";for(var i=e.resultIndex;i<e.results.length;i++){e.results[i].isFinal?FT+=e.results[i][0].transcript:it+=e.results[i][0].transcript;}Q("tbox").textContent=FT+it;Q("tbox").classList.add("show");};
+  RCG.onend=function(){if(!REC){var t=Q("tbox").textContent.trim();if(t){PRO=true;Q("proc").classList.add("show");var p=t.split(/我的错误|错在|错误是|搞混了|分不清|弄错了/);if(p.length>1){Q("qInp").value=p[0].replace(/题目|问题是|题目是/g,"").trim();Q("eInp").value=p.slice(1).join("").trim();}else{Q("qInp").value=t;}Q("tbox").classList.remove("show");Q("tbox").textContent="";Q("proc").classList.remove("show");Q("micLabel").textContent="📝 检查一下，点存入错题本";PRO=false;Q("qInp").style.height="34px";Q("qInp").style.height=Math.min(Q("qInp").scrollHeight,90)+"px";Q("eInp").style.height="34px";Q("eInp").style.height=Math.min(Q("eInp").scrollHeight,90)+"px";}else{Q("micLabel").textContent="点麦克风说话，或直接打字";}}};
+  RCG.onerror=function(){REC=false;PRO=false;Q("micBtn").classList.remove("recording");Q("micLabel").textContent="没听到声音，再试一次";};
+}else{Q("micBtn").style.opacity="0.3";Q("micBtn").style.cursor="default";}
+renderTabs();renderErrTypes();renderNotes();
+</script></body></html>
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>上海上海中考冲刺 - 错题本</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
