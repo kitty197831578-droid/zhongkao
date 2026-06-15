@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>我的成长错题本 · 孔老师</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  background:#faf7f2;color:#2c2c2c;line-height:1.7;min-height:100vh;
+  -webkit-tap-highlight-color:transparent;
+}
+.app-header{
+  background:linear-gradient(135deg,#8B7E74 0%,#A8A09A 100%);color:#fff;
+  padding:18px 20px 14px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+.app-header h1{font-size:20px;font-weight:600;letter-spacing:1px}
+.app-header .sub{font-size:12px;opacity:.75;margin-top:1px}
+.nav-tabs{display:flex;gap:4px;margin-top:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-tabs button{
+  flex-shrink:0;background:rgba(255,255,255,.15);border:none;color:#fff;
+  padding:6px 14px;border-radius:18px;font-size:13px;cursor:pointer;transition:.25s;
+}
+.nav-tabs button:hover{background:rgba(255,255,255,.28)}
+.nav-tabs button.active{background:#fff;color:#5a4f46;font-weight:600}
+.main{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+.page{display:none}.page.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-card{
+  background:#fff;border-radius:10px;padding:14px 10px;text-align:center;
+  box-shadow:0 1px 6px rgba(0,0,0,.04);border:1px solid #ede8e0
+}
+.stat-card .num{font-size:28px;font-weight:700;line-height:1.2}
+.stat-card .label{font-size:12px;color:#8f857b;margin-top:2px}
+.recent-list{background:#fff;border-radius:10px;border:1px solid #ede8e0;overflow:hidden}
+.recent-header{padding:14px 16px 10px;font-size:14px;font-weight:600;color:#5a4f46;border-bottom:1px solid #f0ebe4}
+.entry-card{
+  padding:14px 16px;border-bottom:1px solid #f0ebe4;cursor:pointer;
+  transition:background .2s
+}
+.entry-card:last-child{border-bottom:none}
+.entry-card:active{background:#f0ebe4}
+.entry-card .meta{font-size:11px;color:#aaa39b;display:flex;gap:8px;margin-bottom:3px}
+.cat-tag{display:inline-block;padding:1px 8px;border-radius:9px;font-size:11px;font-weight:500}
+.cat-teach{background:#e8f4f0;color:#3a8b7a}
+.cat-manage{background:#f0eaf8;color:#7c5fa0}
+.cat-grow{background:#fef6e6;color:#b8862a}
+.entry-card .title{font-size:14px;font-weight:500;color:#2c2c2c}
+.entry-card .preview{font-size:12px;color:#8f857b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.entry-card .date{font-size:11px;color:#bbb3ab;margin-top:1px}
+.empty-state{text-align:center;padding:36px 16px;color:#bbb3ab}
+.empty-state .icon{font-size:36px}.empty-state p{font-size:13px;margin-top:4px}
+.form-card{background:#fff;border-radius:10px;border:1px solid #ede8e0;padding:20px;margin-bottom:16px}
+.form-card h2{font-size:15px;font-weight:600;color:#5a4f46;margin-bottom:14px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:#5a4f46;margin-bottom:3px}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:8px 10px;border:1px solid #ddd8d1;border-radius:7px;
+  font-size:14px;font-family:inherit;background:#fefcf9;transition:.2s;
+  -webkit-appearance:none;appearance:none;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  outline:none;border-color:#a8a09a;box-shadow:0 0 0 3px rgba(168,160,154,.15)
+}
+.form-group textarea{min-height:70px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.btn-primary{
+  background:#8B7E74;color:#fff;border:none;padding:10px 20px;border-radius:7px;
+  font-size:14px;cursor:pointer;transition:.25s;font-weight:500;width:100%;
+}
+.btn-primary:hover{background:#73665b}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-secondary{
+  background:#f0ebe4;color:#5a4f46;border:none;padding:7px 14px;border-radius:7px;
+  font-size:12px;cursor:pointer;transition:.2s
+}
+.btn-secondary:hover{background:#e5ddd4}
+.btn-danger{
+  background:#f5e6e4;color:#b55a4a;border:none;padding:7px 14px;border-radius:7px;
+  font-size:12px;cursor:pointer;transition:.2s
+}
+.btn-danger:hover{background:#eed4d0}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:5px}
+.filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{
+  padding:6px 10px;border:1px solid #ddd8d1;border-radius:7px;
+  font-size:12px;background:#fff;font-family:inherit
+}
+.filter-bar input{flex:1;min-width:100px}
+.detail-card{background:#fff;border-radius:10px;border:1px solid #ede8e0;padding:20px}
+.detail-card .back{margin-bottom:12px}
+.detail-card h2{font-size:18px;font-weight:600;color:#2c2c2c;margin-bottom:4px}
+.detail-card .meta-line{font-size:12px;color:#8f857b;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.detail-section{margin-top:14px}
+.detail-section h3{font-size:13px;font-weight:600;color:#5a4f46;margin-bottom:4px;padding-left:8px;border-left:3px solid #bfb6ad}
+.detail-section p{font-size:13px;color:#3a3a3a;line-height:1.8;white-space:pre-wrap}
+.detail-actions{margin-top:18px;display:flex;gap:8px}
+.tag-list{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.tag-list .tag{background:#f0ebe4;padding:2px 8px;border-radius:8px;font-size:11px;color:#5a4f46}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#3a3a3a;color:#fff;padding:10px 20px;border-radius:8px;
+  font-size:13px;opacity:0;transition:opacity .35s;z-index:999;pointer-events:none;
+  white-space:nowrap;max-width:80vw;overflow:hidden;text-overflow:ellipsis;
+}
+.toast.show{opacity:1}
+.loading{text-align:center;padding:20px;color:#8f857b;font-size:13px}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <h1>📓 我的成长错题本</h1>
+  <div class="sub">孔祥旖 · 把每一天的经历变成经验</div>
+  <div class="nav-tabs" id="navTabs">
+    <button class="active" data-page="dashboard">📊 总览</button>
+    <button data-page="add">✏️ 记录</button>
+    <button data-page="list">📖 浏览</button>
+  </div>
+</header>
+<div class="main" id="app">
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="recent-list">
+      <div class="recent-header">最近记录</div>
+      <div id="recentEntries"><div class="loading">加载中…</div></div>
+    </div>
+  </div>
+  <div class="page" id="page-add">
+    <div class="form-card">
+      <h2>✏️ 记录一条新反思</h2>
+      <div class="form-group">
+        <label>标题 <span style="color:#b55a4a">*</span></label>
+        <input id="inputTitle" placeholder="例如：今天《纳米技术》那节课的遗憾">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>分类</label>
+          <select id="inputCategory">
+            <option value="教学反思">🍎 教学反思</option>
+            <option value="班级管理">📋 班级管理</option>
+            <option value="个人成长">🌱 个人成长</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>标签（逗号分隔）</label>
+          <input id="inputTags" placeholder="如：课堂互动, 三年级, 板书">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>📌 情境 / 问题</label>
+        <textarea id="inputSituation" placeholder="当时发生了什么？遇到了什么问题？" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>💡 我的反思</label>
+        <textarea id="inputReflection" placeholder="我为什么觉得这需要改进？我学到了什么？" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>🛠️ 改进方案</label>
+        <textarea id="inputImprovement" placeholder="下次我会怎么做？" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>🔁 后续追踪（可选）</label>
+        <textarea id="inputFollowup" placeholder="后来试过了吗？效果怎么样？" rows="2"></textarea>
+      </div>
+      <button class="btn-primary" id="btnSave" onclick="saveEntry()">💾 保存记录</button>
+    </div>
+  </div>
+  <div class="page" id="page-list">
+    <div class="filter-bar">
+      <select id="filterCategory" onchange="renderList()">
+        <option value="">全部分类</option>
+        <option value="教学反思">🍎 教学反思</option>
+        <option value="班级管理">📋 班级管理</option>
+        <option value="个人成长">🌱 个人成长</option>
+      </select>
+      <input id="filterSearch" placeholder="搜索…" inputmode="search" oninput="renderList()">
+      <button class="btn-secondary btn-sm" onclick="exportData()">📥 导出</button>
+    </div>
+    <div id="entryList"><div class="loading">加载中…</div></div>
+  </div>
+  <div class="page" id="page-detail">
+    <div class="detail-card" id="detailContent"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API = window.location.origin + '/api';
+async function api(url, options) {
+  const resp = await fetch(API + url, {
+    headers: { 'Content-Type': 'application/json' }, ...options
+  });
+  if (!resp.ok) throw new Error('请求失败: ' + resp.status);
+  return resp.json();
+}
+let allEntries = [];
+async function loadEntries() { allEntries = await api('/entries'); }
+async function loadStats() { return await api('/stats'); }
+
+document.querySelectorAll('.nav-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + btn.dataset.page).classList.add('active');
+    if (btn.dataset.page === 'dashboard') renderDashboard();
+    if (btn.dataset.page === 'list') renderList();
+  });
+});
+
+function showPage(pageId) {
+  document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (pageId === 'dashboard') renderDashboard();
+  if (pageId === 'list') renderList();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+async function renderDashboard() {
+  try {
+    await loadEntries();
+    const stats = await loadStats();
+    document.getElementById('statsGrid').innerHTML = [
+      { label: '教学反思', num: stats['教学反思'] || 0, color: '#3a8b7a' },
+      { label: '班级管理', num: stats['班级管理'] || 0, color: '#7c5fa0' },
+      { label: '个人成长', num: stats['个人成长'] || 0, color: '#b8862a' }
+    ].map(s => '<div class="stat-card"><div class="num" style="color:'+s.color+'">'+s.num+'</div><div class="label">'+s.label+'</div></div>').join('');
+    const recent = allEntries.slice(0, 8);
+    document.getElementById('recentEntries').innerHTML = recent.length
+      ? recent.map(e => entryCardHtml(e)).join('')
+      : '<div class="empty-state"><div class="icon">📝</div><p>还没有记录，去写第一条吧！</p></div>';
+  } catch(e) {
+    document.getElementById('recentEntries').innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>连接服务器失败</p></div>';
+  }
+}
+
+function entryCardHtml(e) {
+  const catClass = e.category === '教学反思' ? 'cat-teach' : e.category === '班级管理' ? 'cat-manage' : 'cat-grow';
+  const d = new Date(e.createdAt);
+  const dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const preview = (e.situation || e.reflection || '').slice(0, 50);
+  return '<div class="entry-card" onclick="viewEntry('+e.id+')">'
+    + '<div class="meta"><span class="cat-tag '+catClass+'">'+e.category+'</span><span class="date">'+dateStr+'</span></div>'
+    + '<div class="title">'+(e.title||'无标题')+'</div>'
+    + '<div class="preview">'+preview+(preview.length>=50?'…':'')+'</div></div>';
+}
+
+async function saveEntry() {
+  const title = document.getElementById('inputTitle').value.trim();
+  if (!title) { showToast('请填写标题'); document.getElementById('inputTitle').focus(); return; }
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true; btn.textContent = '保存中…';
+  try {
+    await api('/entries', { method: 'POST', body: JSON.stringify({
+      title,
+      category: document.getElementById('inputCategory').value,
+      tags: document.getElementById('inputTags').value.split(/[,，]/).map(s=>s.trim()).filter(Boolean),
+      situation: document.getElementById('inputSituation').value.trim(),
+      reflection: document.getElementById('inputReflection').value.trim(),
+      improvement: document.getElementById('inputImprovement').value.trim(),
+      followup: document.getElementById('inputFollowup').value.trim()
+    })});
+    ['inputTitle','inputTags','inputSituation','inputReflection','inputImprovement','inputFollowup'].forEach(id=>document.getElementById(id).value='');
+    showToast('✅ 记录已保存');
+    showPage('dashboard');
+  } catch(e) { showToast('保存失败，请重试');
+  } finally { btn.disabled = false; btn.textContent = '💾 保存记录'; }
+}
+
+async function renderList() {
+  try {
+    await loadEntries();
+    const cat = document.getElementById('filterCategory').value;
+    const q = document.getElementById('filterSearch').value.trim().toLowerCase();
+    let filtered = allEntries;
+    if (cat) filtered = filtered.filter(e=>e.category===cat);
+    if (q) filtered = filtered.filter(e=>(e.title||'').toLowerCase().includes(q)||(e.situation||'').toLowerCase().includes(q)||(e.reflection||'').toLowerCase().includes(q)||(e.tags||[]).some(t=>t.toLowerCase().includes(q)));
+    const container = document.getElementById('entryList');
+    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>没有匹配的记录</p></div>'; return; }
+    container.innerHTML = '<div class="recent-list">'+filtered.map(e=>entryCardHtml(e)).join('')+'</div>';
+  } catch(e) { document.getElementById('entryList').innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>连接服务器失败</p></div>'; }
+}
+
+async function viewEntry(id) {
+  try {
+    await loadEntries();
+    const e = allEntries.find(x=>x.id===id);
+    if (!e) { showToast('记录不存在'); return; }
+    const catClass = e.category==='教学反思'?'cat-teach':e.category==='班级管理'?'cat-manage':'cat-grow';
+    const d = new Date(e.createdAt);
+    const dateStr = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const tagsHtml = (e.tags&&e.tags.length) ? '<div class="tag-list">'+e.tags.map(t=>'<span class="tag">#'+escHtml(t)+'</span>').join('')+'</div>' : '';
+    document.getElementById('detailContent').innerHTML = '<div class="back"><button class="btn-secondary btn-sm" onclick="showPage(\'list\')">← 返回列表</button></div>'
+      + '<h2>'+escHtml(e.title)+'</h2><div class="meta-line"><span class="cat-tag '+catClass+'">'+e.category+'</span><span>'+dateStr+'</span></div>'
+      + tagsHtml
+      + (e.situation?'<div class="detail-section"><h3>📌 情境 / 问题</h3><p>'+escHtml(e.situation)+'</p></div>':'')
+      + (e.reflection?'<div class="detail-section"><h3>💡 我的反思</h3><p>'+escHtml(e.reflection)+'</p></div>':'')
+      + (e.improvement?'<div class="detail-section"><h3>🛠️ 改进方案</h3><p>'+escHtml(e.improvement)+'</p></div>':'')
+      + (e.followup?'<div class="detail-section"><h3>🔁 后续追踪</h3><p>'+escHtml(e.followup)+'</p></div>':'')
+      + '<div class="detail-actions"><button class="btn-danger btn-sm" onclick="deleteEntry('+e.id+')">🗑️ 删除</button></div>';
+    showPage('detail');
+  } catch(e) { showToast('加载失败'); }
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function deleteEntry(id) {
+  if (!confirm('确定删除这条记录？')) return;
+  try { await api('/entries/'+id, { method: 'DELETE' }); showToast('已删除'); showPage('list'); }
+  catch(e) { showToast('删除失败'); }
+}
+
+async function exportData() {
+  try {
+    await loadEntries();
+    if (!allEntries.length) { showToast('暂无数据'); return; }
+    const rows = [['日期','分类','标题','标签','情境/问题','反思','改进方案','后续追踪']];
+    allEntries.forEach(e=>{
+      const d = new Date(e.createdAt);
+      rows.push([d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'), e.category, e.title, (e.tags||[]).join('; '), e.situation, e.reflection, e.improvement, e.followup]);
+    });
+    const csv = rows.map(r=>r.map(c=>'"'+(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = '成长错题本_'+new Date().toISOString().slice(0,10)+'.csv';
+    a.click(); URL.revokeObjectURL(a.href);
+    showToast('📥 导出成功');
+  } catch(e) { showToast('导出失败'); }
+}
+
+renderDashboard();
+</script>
+</body>
+</html>
