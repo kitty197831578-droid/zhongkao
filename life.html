@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>人生成长记录 - 错题本</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--card:rgba(255,255,255,0.95);--text:#2d2d2d;--text2:#888;--border:rgba(0,0,0,0.06);--primary:#667eea;--shadow:0 8px 30px rgba(0,0,0,0.12)}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px 16px 80px}
+.header{text-align:center;padding:30px 0 20px}
+.header h1{font-size:24px;font-weight:700;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;gap:8px}
+.header .sub{font-size:13px;color:rgba(255,255,255,0.8);margin-top:6px}
+.tabs{display:flex;gap:6px;padding:0 0 12px;overflow-x:auto;flex-wrap:nowrap}
+.tab{padding:8px 16px;border-radius:20px;border:none;background:rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);font-size:12px;font-weight:500;cursor:pointer;flex-shrink:0;transition:all 0.3s;backdrop-filter:blur(10px)}
+.tab:hover{background:rgba(255,255,255,0.35);transform:translateY(-1px)}
+.tab.active{background:#fff;color:#667eea;font-weight:600;box-shadow:0 4px 15px rgba(0,0,0,0.15)}
+.err-area{padding:0 0 10px}
+.err-select{width:100%;padding:10px 14px;border:none;border-radius:14px;font-size:13px;font-family:inherit;background:var(--card);outline:none;color:var(--text);box-shadow:var(--shadow)}
+.mic-area{display:none}
+.inp-area{padding:0 0 8px;display:flex;flex-direction:column;gap:6px}
+.inp-row{display:flex;gap:8px;align-items:flex-start}
+.inp-row .lbl{font-size:12px;font-weight:600;color:var(--text2);width:40px;flex-shrink:0;line-height:36px;text-align:center}
+.inp-row .inp-wrap{flex:1;background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.inp-row textarea{width:100%;padding:8px 12px;border:none;font-size:13px;font-family:inherit;resize:none;height:36px;line-height:1.5;outline:none;background:transparent;color:var(--text)}
+.inp-row textarea::placeholder{color:#bbb}
+.actions{padding:0 0 10px}
+.actions .s-btn{width:100%;padding:12px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 15px rgba(102,126,234,0.4)}
+.actions .s-btn:active{transform:scale(0.98);opacity:.9}
+.tbox{display:none;margin:0 0 10px;padding:12px 14px;background:var(--card);border-radius:14px;font-size:13px;color:var(--text2);box-shadow:var(--shadow);line-height:1.6}
+.tbox.show{display:block}
+.proc{display:none;justify-content:center;gap:8px;padding:10px;color:var(--primary);font-size:13px;font-weight:500}
+.proc.show{display:flex}
+.list{padding:0 0 10px;display:flex;flex-direction:column;gap:12px}
+.empty{padding:40px 20px;text-align:center;color:rgba(255,255,255,0.6);font-size:14px;line-height:1.8}
+.card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;transition:all 0.3s}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,0.15)}
+.card-h{padding:12px 14px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.card-h .left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bdg{padding:2px 10px;border-radius:12px;font-size:10px;color:#fff;font-weight:600}
+.bdg-guanxi{background:linear-gradient(135deg,#f093fb,#f5576c)}.bdg-gongzuo{background:linear-gradient(135deg,#4facfe,#00f2fe)}.bdg-chengzhang{background:linear-gradient(135deg,#43e97b,#38f9d7)}.bdg-jiankang{background:linear-gradient(135deg,#fa709a,#fee140)}.bdg-qingxu{background:linear-gradient(135deg,#a18cd1,#fbc2eb)}
+.tp{font-size:10px;padding:2px 8px;border-radius:10px;background:#f0f0f5;color:var(--text2)}
+.dt{font-size:10px;color:var(--text2)}
+.del{background:none;border:none;color:#ddd;font-size:14px;cursor:pointer;padding:2px 4px;transition:color 0.2s}
+.del:hover{color:#e74c3c}
+.body{padding:12px 14px}
+.blk{margin-bottom:8px}.blk:last-child{margin-bottom:0}
+.blk-h{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.blk-b{font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+</style>
+</head>
+<body>
+<div class="header"><h1>🌱 人生错题本</h1><div class="sub">选科目+错因→说/打问题→自动整理</div></div>
+<div class="tabs" id="tabs"></div>
+<div class="err-area"><select class="err-select" id="errType"><option value="">选择错因类型</option></select></div>
+<div class="mic-area"><button class="mic-btn" id="micBtn">🎤</button><div class="mic-label" id="micLabel">点麦克风说话，或直接打字</div></div>
+<div class="inp-area"><div class="inp-row"><div class="lbl">📝题目</div><textarea id="qInp" placeholder="比如：现在完成时和一般过去时的区别" rows="1"></textarea></div><div class="inp-row"><div class="lbl">❌错在哪</div><textarea id="eInp" placeholder="比如：分不清have been和went什么时候用" rows="1"></textarea></div></div>
+<div class="actions"><button class="s-btn" id="saveBtn">+ 存入错题本</button></div>
+<div class="tbox" id="tbox"></div><div class="proc" id="proc"><span>⏳ 整理中...</span></div>
+<div class="list" id="list"></div>
+<script>
+var S=["guanxi","gongzuo","chengzhang","jiankang","qingxu"];
+var N=["人际关系","工作学习","个人成长","身心健康","情绪管理"];
+var A="yingyu";
+var NOTES=[];
+var REC=false,PRO=false;
+try{var D=localStorage.getItem("lifenb_v1");if(D)NOTES=JSON.parse(D);}catch(e){}
+function Q(i){return document.getElementById(i);}
+var ET={"guanxi":["沟通失误","不够耐心","边界不清","误解他人","缺乏倾听"],"gongzuo":["拖延","计划不当","效率低下","方向不清","执行力不足"],"chengzhang":["自我怀疑","害怕失败","目标模糊","缺乏坚持","比较心理"],"jiankang":["作息混乱","饮食不当","缺乏运动","压力过大","忽视休息"],"qingxu":["容易发怒","焦虑过度","情绪低落","过度敏感","难以释怀"]};
+// --- Knowledge Base ---
+var KB={
+guanxi:[
+{m:["沟通","倾听","表达","说话"],t:"有效沟通的艺术",b:"沟通的关键不在于说，而在于听。\n\n原则：\n1.先理解再被理解\n2.用\"我希望\"代替\"你应该\"\n3.倾听时不打断、不评判\n4.承认自己可能错了\n\n练习：\n每天找一个人，认真听5分钟，不打断不插话"},
+{m:["边界","底线","拒绝","说no"],t:"设立健康的人际边界",b:"不会拒绝的人，最终会耗尽自己。\n\n设立边界的步骤：\n1.明确自己的底线在哪\n2.用温和但坚定的语气表达\n3.不需要过多解释你的拒绝\n4.对反复越界的人保持距离\n\n记住：设立边界不是自私，是自爱。"},
+{m:["同理心","换位思考","理解","共情"],t:"培养同理心",b:"同理心不是天生的，是可以练习的。\n\n三步法：\n1.放下自己的判断和成见\n2.尝试站在对方的角度看问题\n3.回应对方的感受而非事情本身\n\n问自己：如果我是TA，我会怎么想？"},
+{m:["争吵","吵架","冲突","矛盾"],t:"如何处理冲突",b:"冲突不是坏事，回避冲突才是。\n\n健康争吵的规则：\n1.对事不对人，不说\"你总是…\"\n2.不翻旧账，一次只解决一件事\n3.需要冷静就说\"我们暂停10分钟\"\n4.结束后一定要有修复环节"}
+],
+gongzuo:[
+{m:["拖延","拖延症","procrastination"],t:"战胜拖延的5秒法则",b:"5秒法则：当你有一个想法或任务时，倒数5-4-3-2-1，然后立刻行动。\n\n为什么有效：\n犹豫越久，行动的可能性越低。\n5秒法则绕过你的过度思考，直接启动行动。\n\n今日练习：\n有一件拖延的事？现在数5秒，然后去做。"},
+{m:["目标","规划","计划","OKR"],t:"设定真正可行的目标",b:"SMART原则：\nS具体：不是\"要学好英语\"，而是\"每天背20个单词\"\nM可衡量：用量化指标跟踪\nA可达成：目标要现实\nR相关：与你的大方向一致\nT有时限：设deadline\n\n每周日花15分钟规划下周3个最重要目标"},
+{m:["效率","专注","时间管理","精力"],t:"提高效率的番茄工作法",b:"番茄工作法：\n工作25分钟→休息5分钟→再工作25分钟\n每4个番茄后休息15-30分钟\n\n关键：\n1.一次只做一件事\n2.25分钟内不切换任务\n3.被打断就记录但不处理\n4.找到自己的最佳节奏"},
+{m:["心态","成长","学习","进步"],t:"成长型思维",b:"固定型思维：\"我不擅长这个\"\n成长型思维：\"我只是还没学会\"\n\n改变你的措辞：\n❌ \"我做不到\" → ✅ \"我暂时还不会\"\n❌ \"太难了\" → ✅ \"需要更多时间\"\n❌ \"我不够好\" → ✅ \"我在进步的路上\""}
+],
+chengzhang:[
+{m:["自律","习惯","坚持","意志力"],t:"养成好习惯的秘密",b:"习惯不是靠意志力，而是靠系统。\n\n习惯形成的4步：\n1.提示：让好习惯显而易见\n2.渴望：让好习惯有吸引力\n3.回应：让好习惯简单易行\n4.奖励：让好习惯令人愉悦\n\n两分钟法则：新习惯从2分钟版本开始\n\"每天跑步\"→\"穿上跑鞋\""},
+{m:["失败","犯错","挫折","跌倒"],t:"如何从失败中成长",b:"失败不是终点，是数据点。\n\n复盘四问：\n1.发生了什么？（客观描述）\n2.我学到了什么？\n3.下次可以怎么做？\n4.这件事的积极面是什么？\n\n每个错误都是一次升级的机会。"},
+{m:["自信","自我","价值","认可"],t:"建立健康的自我价值感",b:"自我价值不取决于：\n- 别人的评价\n- 成绩和成就\n- 社交媒体上的点赞\n\n真正的自信来自：\n1.了解自己的优点和缺点\n2.接纳不完美的自己\n3.做自己认可的事情\n4.和自己比较，不和别人比较"},
+{m:["恐惧","害怕","勇气","突破"],t:"如何面对恐惧",b:"恐惧是你的保护机制，不要让它成为牢笼。\n\n面对恐惧的步骤：\n1.问自己：最坏的结果是什么？\n2.这个最坏结果真的那么可怕吗？\n3.我能承受这个结果吗？\n4.如果不做，我会后悔吗？\n\n勇气不是没有恐惧，而是带着恐惧依然前行。"}
+],
+jiankang:[
+{m:["睡眠","作息","熬夜","生物钟"],t:"改善睡眠质量",b:"睡眠是健康的基础，不是奢侈品。\n\n好习惯：\n1.固定作息时间（包括周末）\n2.睡前1小时远离屏幕\n3.卧室保持凉爽、黑暗\n4.午睡不超过30分钟\n5.咖啡因在下午2点后停用"},
+{m:["运动","锻炼","健身","活动"],t:"把运动变成日常",b:"不需要去健身房才能运动。\n\n日常运动方式：\n1.每天步行30分钟\n2.拉伸5分钟（任何时间）\n3.站式办公/学习\n4.用走楼梯代替电梯\n\n关键是：找到你喜欢的运动方式，而不是强迫自己做讨厌的运动"},
+{m:["压力","放松","冥想","呼吸"],t:"缓解压力的呼吸法",b:"4-7-8呼吸法：\n吸气4秒→屏气7秒→呼气8秒\n重复4次\n\n什么时候用：\n- 感到焦虑时\n- 难以入睡时\n- 情绪激动时\n- 需要集中注意力时"},
+{m:["饮食","健康","营养","吃饭"],t:"简单健康的饮食习惯",b:"不需要极端节食，小改变带来大不同：\n1.每餐保证一半蔬菜\n2.多喝水（每天2L）\n3.减少含糖饮料\n4.吃饭时不看手机（专注吃饭）\n5.周末可以适当放松，不苛责自己"}
+],
+qingxu:[
+{m:["焦虑","紧张","担忧","不安"],t:"应对焦虑的实践方法",b:"焦虑是对未来的担忧，把注意力拉回当下。\n\n接地练习（5-4-3-2-1）：\n5个看到的\n4个触摸到的\n3个听到的\n2个闻到的\n1个尝到的\n\n这个练习能快速把你带回当下。"},
+{m:["愤怒","生气","暴躁","发火"],t:"管理愤怒的情绪",b:"愤怒像火焰，控制不好会烧伤自己和身边的人。\n\n暂停的步骤：\n1.觉察到愤怒信号（心跳加快、肌肉绷紧）\n2.深呼吸3次\n3.问自己：我真正需要的是什么？\n4.用\"我感到…因为…\"句式表达\n5.如果无法冷静，离开现场15分钟"},
+{m:["情绪低落","悲伤","抑郁","不开心"],t:"如何应对情绪低落",b:"情绪低落是正常的，不要对抗它，而是接纳它。\n\n可以做：\n1.和信任的人聊一聊\n2.到户外走走，晒太阳\n3.做一件微小但有成就感的事\n4.写下3件值得感恩的事\n\n如果持续超过2周，请寻求专业帮助。"},
+{m:["释怀","放下","原谅","过去"],t:"学会释怀与放下",b:"放下不是忘记，是不再让它控制你。\n\n释怀的练习：\n1.承认：这件事确实伤害了我\n2.接受：已经发生，无法改变\n3.问自己：继续纠结对我有好处吗？\n4.选择放下：不是为了别人，是为了自己\n\n你无法改变过去，但可以改变对过去的看法。"}
+]
+};// --- Knowledge Lookup ---
+function lookup(txt){
+  var entries=KB[A]||[];
+  var best=null,score=0;
+  for(var i=0;i<entries.length;i++){
+    var s=0;
+    for(var k=0;k<entries[i].m.length;k++){if(txt.indexOf(entries[i].m[k])>-1)s+=entries[i].m[k].length;}
+    if(s>score){score=s;best=entries[i];}
+  }
+  return best?('【'+best.t+'】\n'+best.b):'';
+}
+// --- Render ---
+function renderTabs(){
+  var h="";
+  for(var i=0;i<S.length;i++){h+='<button class="tab'+(S[i]===A?' active act-'+S[i]:'')+'" data-s="'+S[i]+'">'+N[i]+'</button>';}
+  Q("tabs").innerHTML=h;
+}
+function renderErrTypes(){
+  var t=ET[A]||[];
+  var h='<option value="">选择错因类型</option>';
+  for(var i=0;i<t.length;i++)h+='<option value="'+t[i]+'">'+t[i]+'</option>';
+  Q("errType").innerHTML=h;
+}
+function renderNotes(){
+  var f=[];
+  for(var i=NOTES.length-1;i>=0;i--){if(NOTES[i].s===A)f.push(NOTES[i]);}
+  if(!f.length){
+    var ni=0;for(var j=0;j<S.length;j++){if(S[j]===A){ni=j;break;}}
+    Q("list").innerHTML='<div class="empty">还没有'+N[ni]+'的错题<br>选错因类型→填题目和错因→保存</div>';return;
+  }
+  function nm(s){for(var j=0;j<S.length;j++){if(S[j]===s)return N[j];}return s;}
+  var h="";
+  for(var i=0;i<f.length;i++){
+    var o=f[i];
+    h+='<div class="card"><div class="card-h"><div class="left"><span class="bdg bdg-'+o.s+'">'+nm(o.s)+'</span><span class="tp">'+o.t+'</span></div><span class="dt">'+o.d+'</span><button class="del" data-d="'+o.id+'">✕</button></div><div class="body">'+
+    (o.q?'<div class="blk"><div class="blk-h">📝 题目</div><div class="blk-b">'+o.q+'</div></div>':'')+
+    (o.e?'<div class="blk"><div class="blk-h">❌ 我的错误</div><div class="blk-b">'+o.e+'</div></div>':'')+
+    (o.x?'<div class="blk"><div class="blk-h">✅ 正确解法+知识点解析</div><div class="blk-b">'+o.x+'</div></div>':'')+
+    '</div></div>';
+  }
+  Q("list").innerHTML=h;
+}
+function saveNotes(){try{localStorage.setItem("lifenb_v1",JSON.stringify(NOTES));}catch(e){}}
+function addNote(o){NOTES.push(o);saveNotes();renderNotes();}
+function delNote(id){var t=[];for(var i=0;i<NOTES.length;i++){if(NOTES[i].id!==id)t.push(NOTES[i]);}NOTES=t;saveNotes();renderNotes();}
+// --- Events ---
+Q("tabs").addEventListener("click",function(e){
+  var t=e.target.closest(".tab");if(!t)return;
+  A=t.getAttribute("data-s");renderTabs();renderErrTypes();renderNotes();
+});
+Q("saveBtn").addEventListener("click",function(){
+  var ty=Q("errType").value;if(!ty){alert("请选择错因类型");return;}
+  var qu=Q("qInp").value.trim();var er=Q("eInp").value.trim();
+  if(!qu&&!er){alert("请填写题目或错误描述");return;}
+  // KB lookup
+  var txt=(qu+" "+er).replace(/[呃嗯那个然后就是所以反正其实]/g,"");
+  var sol=lookup(txt);
+  if(!sol)sol="【学习笔记】\n关于「"+(qu||er).slice(0,12)+"…」的错题已保存。\n\n复习建议：\n1. 翻开课本找到对应章节\n2. 把定义/公式/规则抄一遍\n3. 做2-3道对应练习题\n4. 过两天回来复习这道错题";
+  var d=new Date();
+  addNote({
+    id:Date.now(),s:A,t:ty,q:qu||"(未填写)",e:er||"(未填写)",x:sol,
+    d:d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)
+  });
+  Q("qInp").value="";Q("eInp").value="";
+  Q("micLabel").textContent="✅ 已保存！再记一条";
+  setTimeout(function(){Q("micLabel").textContent="点麦克风说话，或直接打字";},2000);
+});
+Q("list").addEventListener("click",function(e){
+  var b=e.target.closest("[data-d]");if(!b)return;
+  if(confirm("删除这条错题？"))delNote(Number(b.getAttribute("data-d")));
+});
+[Q("qInp"),Q("eInp")].forEach(function(el){
+  el.addEventListener("input",function(){this.style.height="34px";this.style.height=Math.min(this.scrollHeight,90)+"px";});
+});
+// --- Voice ---
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+var RCG=null;if(SR){RCG=new SR();RCG.lang="zh-CN";RCG.continuous=true;RCG.interimResults=true;}
+if(RCG){
+  Q("micBtn").addEventListener("click",function(){
+    if(PRO)return;
+    if(REC){REC=false;RCG.stop();Q("micBtn").classList.remove("recording");Q("micLabel").textContent="处理中...";return;}
+    REC=true;Q("micBtn").classList.add("recording");Q("micLabel").textContent="🎤 正在听...说说题目和哪里错了";
+    Q("tbox").classList.remove("show");Q("tbox").textContent="";RCG.start();
+  });
+  var FT="";
+  RCG.onresult=function(e){var it="";for(var i=e.resultIndex;i<e.results.length;i++){e.results[i].isFinal?FT+=e.results[i][0].transcript:it+=e.results[i][0].transcript;}Q("tbox").textContent=FT+it;Q("tbox").classList.add("show");};
+  RCG.onend=function(){if(!REC){var t=Q("tbox").textContent.trim();if(t){PRO=true;Q("proc").classList.add("show");var p=t.split(/我的错误|错在|错误是|搞混了|分不清|弄错了/);if(p.length>1){Q("qInp").value=p[0].replace(/题目|问题是|题目是/g,"").trim();Q("eInp").value=p.slice(1).join("").trim();}else{Q("qInp").value=t;}Q("tbox").classList.remove("show");Q("tbox").textContent="";Q("proc").classList.remove("show");Q("micLabel").textContent="📝 检查一下，点存入错题本";PRO=false;Q("qInp").style.height="34px";Q("qInp").style.height=Math.min(Q("qInp").scrollHeight,90)+"px";Q("eInp").style.height="34px";Q("eInp").style.height=Math.min(Q("eInp").scrollHeight,90)+"px";}else{Q("micLabel").textContent="点麦克风说话，或直接打字";}}};
+  RCG.onerror=function(){REC=false;PRO=false;Q("micBtn").classList.remove("recording");Q("micLabel").textContent="没听到声音，再试一次";};
+}else{Q("micBtn").style.opacity="0.3";Q("micBtn").style.cursor="default";}
+renderTabs();renderErrTypes();renderNotes();
+</script></body></html>
+
