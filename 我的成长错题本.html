@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -79,6 +79,7 @@ body{font-family:-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sa
 <div class="main" id="app">
 <div class="page active" id="page-dash">
   <div class="stats" id="stats"></div>
+<div style="margin-bottom:16px"><button class="btn-sec" id="syncBtn" onclick="syncToGitHub()" style="width:100%;text-align:center;padding:10px;font-size:13px">☁️ 同步到 GitHub</button></div>
   <div class="recent">
     <div class="recent-h">最近记录</div>
     <div id="recent"></div>
@@ -218,5 +219,40 @@ function imp(e){
 
 dash();
 </script>
-</body>
+<script>
+// ── GitHub Sync ──
+const GH_OWNER='kitty197831578-droid';const GH_REPO='zhongkao';const GH_BRANCH='main';const DATA_FILE='data.json';const GH_TOKEN=localStorage.getItem('gh_token')||'';
+
+async function loadFromGitHub(){
+  try{
+    const url='https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/'+DATA_FILE;
+    const resp=await fetch(url);
+    if(!resp.ok)return false;
+    const remote=await resp.json();
+    if(!Array.isArray(remote)||!remote.length)return false;
+    L();
+    const ids=new Set(D.map(e=>e.id));
+    let merged=false;
+    remote.forEach(e=>{if(!ids.has(e.id)){D.push(e);merged=true}});
+    if(merged){S();return true}
+    return false;
+  }catch(e){return false}
+}
+
+function syncToGitHub(){
+  L();
+  if(!D.length){T('暂无数据可同步');return}
+  const json=encodeURIComponent(JSON.stringify(D,null,2));
+  window.open('https://github.com/'+GH_OWNER+'/'+GH_REPO+'/'+'new/'+GH_BRANCH+'?filename='+DATA_FILE+'&value='+json,'_blank');
+  T('☁️ 打开新页面后直接点 Commit changes')
+}
+
+(async function(){
+  try{
+    const ok=await loadFromGitHub();
+    if(ok){dash();T('☁️ 已从云端同步新数据')}
+  }catch(e){}
+})();
+</script></body>
 </html>
+
